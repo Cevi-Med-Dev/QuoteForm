@@ -24,11 +24,12 @@ let approved = (input) => {
   document.getElementById("next").disabled = Array.from(
     document.querySelectorAll("#formContainer .errorText")
   ).some( errMsg => errMsg.style.display === "flex");
-
 };
 
 document.getElementById("next").addEventListener("click", () => {
   if (currentView === 1) {
+    document.querySelector(".active").classList.remove("active")
+    document.querySelector("li#step2 aside.bar").classList.add("active")
     document.getElementById("viewSwitch").innerHTML = `<div class="fields">
                 <div>
                     <label for="fName">First name:</label>
@@ -94,6 +95,8 @@ document.getElementById("next").addEventListener("click", () => {
       });
     });
   } else if (currentView === 2) {
+    document.querySelector(".active").classList.remove("active")
+    document.querySelector("li#step3 aside.bar").classList.add("active")
     document.getElementById("formContainer").classList.add("confirmation");
   }
 });
