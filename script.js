@@ -124,6 +124,8 @@ document.getElementById("next").addEventListener("click", () => {
       document.getElementById("next").innerText = "Close"
      document.getElementById("steps").style.display = "none"
     currentView++;
+  }else if (currentView === 4) {
+    document.getElementById("formContainer").style.display = "none"
   }
 });
 
@@ -135,6 +137,7 @@ document.getElementById("back").addEventListener("click", () => {
       "Choose items you would like to include in your quote";
     document.querySelector("#formHeader img").src = "./one.svg";
     document.getElementById("back").innerText = "Continue Shopping";
+    document.getElementById("next").innerText = "Next"
     document.getElementById(
       "viewSwitch"
     ).innerHTML = `<img src="./img.jpg" style="width: 100%;">`;
@@ -144,6 +147,7 @@ document.getElementById("back").addEventListener("click", () => {
     document.querySelector("li#step2").classList.add("active");
     document.querySelector("#formHeader h4").innerText = "Please fill out Shipping Information";
     document.querySelector("#formHeader img").src = "./2.svg";
+    document.getElementById("next").innerText = "Next"
     document.querySelector("#viewSwitch").innerHTML = `<div class="fields">
                 <div>
                     <label for="fName">First name:</label>
