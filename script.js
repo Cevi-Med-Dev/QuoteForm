@@ -11,6 +11,7 @@ const regExpObject = {
 };
 let currentView = 1;
 let shippingArray = [];
+let quoteArray = []
 let error = (input) => {
   input.classList.add("error");
   input.nextElementSibling.innerHTML = `<img src="./icon-error.svg"/ class="errorImg"> ${input.placeholder} is Invalid`;
@@ -24,6 +25,28 @@ let approved = (input) => {
     document.querySelectorAll("#formContainer .errorText")
   ).some((errMsg) => errMsg.style.display === "flex");
 };
+
+let getData = ()=> {
+  console.log("getData executed")
+  let CM = 2267
+  fetch(`https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727`)
+  .then((response) => response.text()).then((data) => {
+    first_subs = data.substring(40)
+    data = first_subs.substring(0, first_subs.length - 2)
+    return JSON.parse(data)
+}).then( data => {
+  quoteArray.some(item => data.items[0].product_id === item.product_id)
+  !quoteArray.some(item => data.items[0].product_id === item.product_id) && quoteArray.push(...data.items)
+  console.log("Quote Items Array : ", quoteArray)
+})
+return quoteArray
+}
+
+document.getElementById("quoteTrigger").addEventListener('click', ()=>{
+  document.getElementById("formContainer").style.display = "flex"
+  let newItem = getData()
+})
+
 document.getElementById("next").addEventListener("click", () => {
   if (currentView === 1) {
     document.querySelector(".active").classList.remove("active");
@@ -207,3 +230,4 @@ document.getElementById("back").addEventListener("click", () => {
     currentView--
   }
 });
+

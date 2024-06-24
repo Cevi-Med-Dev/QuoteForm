@@ -36,6 +36,8 @@
             }
         }
 
+
+
         #formContainer.confirmation::before {
             content: "";
             height: 100%;
@@ -51,7 +53,7 @@
         }
 
         #formContainer {
-            display: flex;
+            display: none;
             flex-direction: column;
             align-items: center;
             position: relative;
@@ -317,7 +319,11 @@
 </head>
 
 <body>
-
+    <div class="btns">
+        <button class="btn2" id="quoteTrigger">
+            Get Quote
+        </button>
+    </div>
     <section id="formContainer">
         <nav id="steps">
             <ul>
@@ -346,7 +352,9 @@
                 <img src="./one.svg" alt="">
             </header>
             <form id="viewSwitch">
-                <img src="./img.jpg" style="width: 100%;">
+                <ul id="quoteList">
+                
+                </ul>
             </form>
             <div class="btns">
                 <button class="btn1" id="back">Continue Shopping</button>
