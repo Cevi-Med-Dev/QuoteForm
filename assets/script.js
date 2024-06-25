@@ -61,11 +61,11 @@ let getData = () => {
             </aside>
         </div>
         <div id="quoteBtns">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" fill="none" xmlns:v="https://vecta.io/nano"><path d="M1 4h16m-4 0l-.271-.812c-.262-.787-.393-1.18-.637-1.471a2 2 0 0 0-.802-.578C10.938 1 10.523 1 9.694 1H8.306c-.829 0-1.244 0-1.597.139a2 2 0 0 0-.802.578c-.243.291-.374.684-.637 1.471L5 4m10 0v10.2c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311C12.72 19 11.88 19 10.2 19H7.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C3 16.72 3 15.88 3 14.2V4m8 4v7M7 8v7" stroke="#c40c11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <button class="qtyBtn">-</button>
-            <small>${item.quantity}</small>
-            <button class="qtyBtn">+</button>
+        <button class="qtyBtn btn1"> - </button>
+        <small>${item.quantity}</small>
+        <button class="qtyBtn btn2"> + </button>
         </div>
+        <img src="./assets/trash.svg" alt="trash" id="trashIcon"/>
       </aside>`;
   });
 

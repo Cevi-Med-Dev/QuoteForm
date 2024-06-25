@@ -164,6 +164,7 @@ section#quotedItemsList{
     flex-direction: column;
 }
 aside#item{
+    position: relative;
     display: flex;
     flex-direction: row;
     list-style-type: none;
@@ -171,6 +172,13 @@ aside#item{
     border-top: 1px solid #D9D9D9;
     margin: 15px 0;
 }
+aside#item img#trashIcon{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 12px;
+    cursor: pointer;
+  }
 aside#item div{
     display: flex;
     justify-content: center;
@@ -189,7 +197,7 @@ aside#item div#itemDetails{
     width: 80%;
 }
 aside#item div#itemDetails h4{
-    margin: 10px 0;
+    margin: 10px 5px;
     text-align: center;
     color: #c40c11;
 }
@@ -198,8 +206,14 @@ aside#item div#itemDetails aside{
     margin: 2px 10px;
     padding: 5px;
 }
-aside#item div#qtyDetails{
-  
+aside#item div#quoteBtns{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+div#quoteBtns button.qtyBtn{
+  border-radius: 50%;
+  border: none;
 }
 .fields {
     display: flex;
