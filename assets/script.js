@@ -27,8 +27,7 @@ let approved = (input) => {
 };
 
 let getData = () => {
-  console.log("getData executed");
-  let CM = Math.floor(Math.random() * (2224 - 2258 + 1)) + 2228;
+  let CM = 2220 + Math.floor(Math.random() * (1 - 9 + 1)) + 9;
   fetch(
     `https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727`
   )
@@ -57,7 +56,7 @@ let getData = () => {
               <br/>
               <p>${item.description.substr(0, 100)}...</p>
               <br/>
-              <a href=${item.link}> Product Details </a>
+              <a target="blank" href=${item.link}> Product Details </a>
             </aside>
         </div>
         <div id="quoteBtns">
@@ -65,7 +64,7 @@ let getData = () => {
         <small>${item.quantity}</small>
         <button class="qtyBtn btn2"> + </button>
         </div>
-        <img src="./assets/trash.svg" alt="trash" id="trashIcon"/>
+        <img src="./assets/trash.svg" alt="trash" class="trashIcon" id=${item.product_id}/>
       </aside>`;
   });
 
@@ -75,9 +74,13 @@ let getData = () => {
 document.getElementById("quoteTrigger").addEventListener("click", () => {
   document.getElementById("formContainer").style.display = "flex";
   let newItem = getData();
-  console.log(newItem);
   localStorage.setItem("quoteItems", JSON.stringify(newItem));
+  document.querySelector(".trashIcon").addEventListener("click", ({target}) => {
+    console.log(target)
+  });
+  
 });
+
 
 JSON.parse(localStorage.getItem("quoteItems"));
 document.getElementById("next").addEventListener("click", () => {
@@ -86,7 +89,7 @@ document.getElementById("next").addEventListener("click", () => {
     document.querySelector("li#step2").classList.add("active");
     document.querySelector("#formHeader h4").innerText =
       "Please fill out  Shipping Information ";
-    document.querySelector("#formHeader img").src = "./2.svg";
+    document.querySelector("#formHeader img").src = "./assets/two.svg";
     document.getElementById("viewSwitch").innerHTML = `<div class="fields">
                 <div>
                     <label for="fName">First name:</label>
