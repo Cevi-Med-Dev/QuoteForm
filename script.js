@@ -11,7 +11,7 @@ const regExpObject = {
 };
 let currentView = 1;
 let shippingArray = [];
-let quoteArray = []
+let quoteArray = JSON.parse(localStorage.getItem("quoteItems")) || []
 let error = (input) => {
   input.classList.add("error");
   input.nextElementSibling.innerHTML = `<img src="./icon-error.svg"/ class="errorImg"> ${input.placeholder} is Invalid`;
@@ -35,18 +35,31 @@ let getData = ()=> {
     data = first_subs.substring(0, first_subs.length - 2)
     return JSON.parse(data)
 }).then( data => {
-  quoteArray.some(item => data.items[0].product_id === item.product_id)
   !quoteArray.some(item => data.items[0].product_id === item.product_id) && quoteArray.push(...data.items)
-  console.log("Quote Items Array : ", quoteArray)
+  
 })
+document.getElementById("quotedItemsList").innerHTML =  quoteArray.map( item => `
+  <aside>
+  <img src=${item.image_link} alt="product image">
+  <ul>
+    <li> Price : ${JSON.stringify(item.title)}</li>
+    <li> Price : ${JSON.stringify(item.description)}</li>
+    <li> Price : ${JSON.stringify(item.list_price)}</li>
+  </ul>
+  </aside>
+  `)
+
 return quoteArray
 }
 
 document.getElementById("quoteTrigger").addEventListener('click', ()=>{
   document.getElementById("formContainer").style.display = "flex"
   let newItem = getData()
+  console.log(newItem)
+  localStorage.setItem("quoteItems" , JSON.stringify(newItem))
 })
 
+JSON.parse(localStorage.getItem("quoteItems"))
 document.getElementById("next").addEventListener("click", () => {
   if (currentView === 1) {
     document.querySelector(".active").classList.remove("active");
