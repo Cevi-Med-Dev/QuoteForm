@@ -84,7 +84,7 @@ body {
     border: 0.3px solid #D9D9D9;
     box-shadow: 0px 5px 7px #c40c1264;
     background-color: white;
-    width: 60%;
+    width: 70%;
     min-width: 250px;
     height: max-content;
     margin-top: 100px;
@@ -159,11 +159,12 @@ nav#steps .bar {
     margin-bottom: 20px;
 }
 
-section#quotedItemsList{
+section#quotedItemsList {
     display: flex;
     flex-direction: column;
 }
-aside#item{
+
+aside#item {
     position: relative;
     display: flex;
     flex-direction: row;
@@ -172,52 +173,70 @@ aside#item{
     border-top: 1px solid #D9D9D9;
     margin: 15px 0;
 }
-aside#item img.trashIcon{
+
+aside#item img.trashIcon {
     position: absolute;
     top: 5px;
     right: 5px;
     width: 12px;
     cursor: pointer;
-  }
-aside#item div{
+}
+
+aside#item div {
     display: flex;
     justify-content: center;
     align-items: center;
 }
-aside#item div#imgContainer{
-    width: 100px;
+
+aside#item div#imgContainer {
+    width: 30%;
     height: auto;
 }
-aside#item div#imgContainer img{
-    height: 120px;   
+
+aside#item div#imgContainer img {
+    height: auto;
+    width: 100%;
 }
-aside#item div#itemDetails{
+
+aside#item div#itemDetails {
     flex-direction: column;
     justify-content: center;
     width: 80%;
 }
-aside#item div#itemDetails h4{
+
+aside#item div#itemDetails h4 {
     margin: 10px 5px;
     text-align: center;
     color: #c40c11;
 }
-aside#item div#itemDetails aside{
+
+aside#item div#itemDetails aside {
     font-size: 10px;
     margin: 2px 10px;
     padding: 5px;
 }
-aside#item div#quoteBtns{
-  position: relative;
-  display: flex;
-  justify-content: space-between;
+
+aside#item div#quoteBtns {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
 }
 
-div#quoteBtns button.qtyBtn{
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  margin: 3px;
+div#quoteBtns button.qtyBtn {
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    margin: 3px;
 }
+
+div#quoteBtns button.qtyBtn img {
+    width: 10px;
+}
+
+div#quoteBtns .btn1:hover{
+    background-color: white !important;
+}
+
 .fields {
     display: flex;
     align-items: center;
@@ -275,6 +294,7 @@ div#quoteBtns button.qtyBtn{
     font-weight: bold;
     border: 2px solid #C40C11 !important;
 }
+
 
 .btn1:hover {
     background-color: #C40C11;
@@ -378,7 +398,7 @@ a#shipIcon {
 
 a#shipIcon:hover span#shippingHover {
     display: block !important;
-  
+
     font-size: 8px;
     width: max-content;
     background-color: #c40c11;
