@@ -64,7 +64,7 @@ const populateItemsList = (array) => {
               <br/>
               <p> ${item.description}</p>
               <br/>
-              <a targetIdlank" href=${item.link}> Product Details </a>
+              <a target="blank" href=${item.link}> Product Details </a>
             </aside>
         </div>
         <div id="quoteBtns">
