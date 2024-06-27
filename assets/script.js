@@ -25,12 +25,17 @@ const approved = (input) => {
     document.querySelectorAll("#formContainer .errorText")
   ).some((errMsg) => errMsg.style.display === "flex");
 };
-const removeItem = (id) => {
-  console.log(id,quoteArray, quoteArray.filter(item => item.id != id))
-  let filteredArray = quoteArray.filter(item => item.id != id)
-  localStorage.setItem("quotedItems", filteredArray)
-}
+const removeItem = (targetId) => {
+  console.log(
+    "remove",
+    quoteArray,
+    quoteArray.filter((item) => item.product_id != targetId)
+  );
+  let filteredArray = quoteArray.filter((item) => item.product_id != targetId);
+  localStorage.setItem("quoteItems", JSON.stringify(filteredArray));
+};
 const populateItemsList = (array) => {
+  console.log("populate");
   document.getElementById("viewSwitch").innerHTML = "";
   array.forEach((item) => {
     document.getElementById("viewSwitch").innerHTML += `
@@ -45,16 +50,51 @@ const populateItemsList = (array) => {
               <br/>
               <p>${item.description.substr(0, 100)}...</p>
               <br/>
-              <a target="blank" href=${item.link}> Product Details </a>
+              <a targetIdlank" href=${item.link}> Product Details </a>
             </aside>
         </div>
         <div id="quoteBtns">
-        <button class="qtyBtn btn1"><img src="./assets/remove.svg"/></button>
+      ${
+        currentView === 3
+          ? `
+         <button class="qtyBtn btn1 remove"><img id=${item.product_id} src="./assets/remove.svg"/> </button>
+
         <small>${item.quantity}</small>
-        <button class="qtyBtn btn1"> <img src="./assets/add.svg"/></button>
+
+        <button class="qtyBtn btn1 add"> <img id=${item.product_id} src="./assets/add.svg"/></button>
         </div>
-        <img src="./assets/trash.svg" onClick={${removeItem(item.product_id)}} alt="trash" class="trashIcon"/>
+        <img src="./assets/trash.svg" id=${item.product_id} alt="trash" class="trashIcon"/>
+        `
+          : `<small>${item.quantity}</small>`
+      }
+       
       </aside>`;
+  });
+  document.querySelectorAll(".trashIcon").forEach((trash) => {
+    trash.addEventListener("click", () => {
+      console.log("remove by id = ", trash.id);
+      removeItem(trash.id);
+      quoteArray = JSON.parse(localStorage.getItem("quoteItems"));
+      populateItemsList(quoteArray);
+    });
+  });
+  document.querySelectorAll(".add").forEach((addBtn) => {
+    addBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("increment qty = ", e.target.id, addBtn);
+    });
+  });
+
+  document.querySelectorAll(".remove").forEach((addBtn) => {
+    addBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log(
+        "decrement qty = ",
+        e.target.id,
+        addBtn,
+        quoteArray.filter((item) => item.product_id === `${e.target.id}`)
+      );
+    });
   });
 };
 const getData = () => {
@@ -74,7 +114,6 @@ const getData = () => {
         (item) => data.items[0].product_id === item.product_id
       ) && quoteArray.push(...data.items);
     });
-  console.log(quoteArray);
   populateItemsList(quoteArray);
   localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
   return quoteArray;
@@ -87,7 +126,7 @@ const itemListView = () => {
   document.querySelector("#formHeader img").src = "./assets/one.svg";
   document.getElementById("back").innerText = "Continue Shopping";
   document.getElementById("next").innerText = "Next";
-  populateItemsList(getData());
+  populateItemsList(quoteArray);
   document.getElementById("next").disabled = false;
 };
 const shippingFormView = () => {
@@ -99,7 +138,7 @@ const shippingFormView = () => {
   document.getElementById("viewSwitch").innerHTML = `<div class="fields">
               <div>
                   <label for="fName">First name:</label>
-                  <input type="text" id="fname" name="fName" placeholder="First name">
+                  <input type="text" id="fName" name="fName" placeholder="First name">
                   <span class="errorText" style="display: none"></span>
               </div>
               <div>
@@ -151,9 +190,8 @@ const shippingFormView = () => {
              <span class="errorText" style="display: none"></span>
                   </div>
           </div>`;
-
   document.getElementById("back").innerText = "Back";
-
+  document.getElementById("next").innerText = "next";
   Array.from(document.querySelectorAll("input")).forEach((input) => {
     input.addEventListener("focusout", () => {
       let rgx = new RegExp(regExpObject[`${input.name}`]);
@@ -162,17 +200,21 @@ const shippingFormView = () => {
   });
 };
 const quoteReview = (array) => {
+  console.log(array);
   document.querySelector(".active").classList.remove("active");
   document.querySelector("li#step3").classList.add("active");
   document.querySelector("#formHeader h4").innerText = "Review Quote Details";
   document.querySelector("#formHeader img").src = "./assets/three.svg";
-  populateItemsList(getData());
+  quoteArray = JSON.parse(localStorage.getItem("quoteItems"));
+  populateItemsList(quoteArray);
   document.getElementById("viewSwitch").innerHTML += `
     <h4>Destination</h4>
     ${array
-      .map((data) => `<span>${data.placeholder} :  ${data.value}</span><br/>`)
+      .map(
+        (data) =>
+          data.value && `<span> ${data.placeholder} : ${data.value}</span><br/>`
+      )
       .join("")}`;
-  console.log(array);
   document.getElementById("next").innerText = "Confirm";
 };
 const confirmationView = () => {
@@ -187,55 +229,47 @@ const confirmationView = () => {
   document.getElementById("next").innerText = "Close";
   document.getElementById("steps").style.display = "none";
 };
-// using bigCommerce template language a snippet with CSS and Js need to be called when button is clicked
 
 document.getElementById("quoteTrigger").addEventListener("click", (e) => {
-  e.stopPropagation()
-  Array.from(document.querySelectorAll(".trashIcon").forEach(trash => {
-    console.log(trash)
-    trash.addEventListener("click", removeItem(trash.id))
-  }))
-  document.getElementById("formContainer").style.display = "flex";
   let newItem = getData();
   localStorage.setItem("quoteItems", JSON.stringify(newItem));
+  quoteArray = JSON.parse(localStorage.getItem("quoteItems"));
+  populateItemsList(quoteArray);
 });
 
 document.getElementById("next").addEventListener("click", () => {
-  console.log(currentView);
   if (currentView === 1) {
-    shippingFormView();
-
     currentView++;
+    shippingFormView();
   } else if (currentView === 2) {
     shippingDataArray = [];
-    Array.from(document.querySelectorAll("input"))
-      .splice(0, 1)
-      .forEach((input) => {
-        if (input.value == "") {
-          error(input);
-        } else {
-          shippingDataArray.push(input);
-          approved(input);
-        }
-      });
+    //for each one take the value add to a local storage key value called to populate information they have used
+    Array.from(document.querySelectorAll("input")).forEach((input) => {
+      if (input.value == "" && input.id === "fName") {
+        error(input);
+      } else {
+        shippingDataArray.push(input);
+        approved(input);
+      }
+    });
 
     !Array.from(document.querySelectorAll("input")).some((input) =>
       input.classList.contains("error")
-    ) && quoteReview(shippingDataArray),
-      currentView++;
+    ) && currentView++,
+      quoteReview(shippingDataArray);
   } else if (currentView === 3) {
-    confirmationView();
     currentView++;
+    confirmationView();
   } else if (currentView === 4) {
     document.getElementById("formContainer").style.display = "none";
     currentView++;
   }
 });
 
-// button works good
 document.getElementById("back").addEventListener("click", () => {
   console.log(currentView);
   if (currentView === 2) {
+    console.log("item list");
     itemListView();
     currentView--;
   } else if (currentView === 3) {
@@ -244,3 +278,5 @@ document.getElementById("back").addEventListener("click", () => {
     currentView--;
   }
 });
+
+currentView === 1 && itemListView();
