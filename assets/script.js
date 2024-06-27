@@ -43,30 +43,43 @@ const populateItemsList = (array) => {
         <div id="imgContainer">
             <img src=${item.image_link} alt="product image">
         </div>
-        <div id="itemDetails">
+        ${
+          currentView != 3
+            ? `
+       <div id="itemDetails">
             <h4>${item.title}</h4>
             <aside>
-              <span> Original Price ${item.list_price}...</span>
+              <span> Original Price ${item.list_price}</span>
               <br/>
-              <p>${item.description.substr(0, 100)}...</p>
+              <p>${item.description}</p>
               <br/>
               <a targetIdlank" href=${item.link}> Product Details </a>
             </aside>
         </div>
         <div id="quoteBtns">
-      ${
-        currentView === 3
-          ? `
-         <button class="qtyBtn btn1 remove"><img id=${item.product_id} src="./assets/remove.svg"/> </button>
-
-        <small>${item.quantity}</small>
-
-        <button class="qtyBtn btn1 add"> <img id=${item.product_id} src="./assets/add.svg"/></button>
+            <button class="qtyBtn btn1 remove"><img id=${
+              item.product_id
+            } src="./assets/remove.svg"/> </button>
+            <small>${item.quantity}</small>
+            <button class="qtyBtn btn1 add"> <img id=${
+              item.product_id
+            } src="./assets/add.svg"/></button>
         </div>
-        <img src="./assets/trash.svg" id=${item.product_id} alt="trash" class="trashIcon"/>
+        <img src="./assets/trash.svg" id=${
+          item.product_id
+        } alt="trash" class="trashIcon"/>
         `
-          : `<small>${item.quantity}</small>`
-      }
+            : `   
+        <div id="itemDetails">
+            <h4>${item.title}</h4>
+            <aside>
+              <p>${item.description.substr(0, 50)}...</p>
+            </aside>
+        </div>
+        <div id="quoteBtns">
+          <h3> Qty : ${item.quantity}</h3>
+        </div>`
+        }
        
       </aside>`;
   });
