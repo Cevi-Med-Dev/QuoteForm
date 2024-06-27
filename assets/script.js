@@ -75,7 +75,6 @@ const populateItemsList = (array) => {
         <img src="./assets/trash.svg" id=${item.product_id} alt="trash" class="trashIcon"/>
         `
         }
-       
       </aside>`;
   });
 
@@ -92,7 +91,9 @@ const populateItemsList = (array) => {
   document.querySelectorAll(".add").forEach((addBtn) => {
     addBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("increment qty = ", e.target.id, addBtn);
+      quoteArray.find(item => item.product_id === e.target.id).quantity = Number(quoteArray.find(item => item.product_id === e.target.id).quantity) + 1
+      localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
+      populateItemsList(quoteArray)
     });
   });
 
@@ -106,6 +107,7 @@ const populateItemsList = (array) => {
         addBtn,
         quoteArray.filter((item) => item.product_id === `${e.target.id}`)
       );
+      localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
     });
   });
 };
@@ -132,7 +134,7 @@ const getData = () => {
   return quoteArray;
 };
 
-//View changes SPA feature
+//View change - SPA feature
 const itemListView = () => {
   document.querySelector(".active").classList.remove("active");
   document.querySelector("li#step1").classList.add("active");
@@ -268,10 +270,12 @@ document.getElementById("next").addEventListener("click", () => {
         approved(input);
       }
     });
+
     //Runs through every input && checks for typos then visually notifies user
     !Array.from(document.querySelectorAll("input")).some((input) =>
       input.classList.contains("error")
-    ) && currentView++, quoteReview(shippingDataArray);
+    ) && currentView++,
+      quoteReview(shippingDataArray);
   } else if (currentView === 3) {
     confirmationView();
     currentView++;
