@@ -25,6 +25,11 @@ const approved = (input) => {
     document.querySelectorAll("#formContainer .errorText")
   ).some((errMsg) => errMsg.style.display === "flex");
 };
+const removeItem = (id) => {
+  console.log(id,quoteArray, quoteArray.filter(item => item.id != id))
+  let filteredArray = quoteArray.filter(item => item.id != id)
+  localStorage.setItem("quotedItems", filteredArray)
+}
 const populateItemsList = (array) => {
   document.getElementById("viewSwitch").innerHTML = "";
   array.forEach((item) => {
@@ -48,9 +53,7 @@ const populateItemsList = (array) => {
         <small>${item.quantity}</small>
         <button class="qtyBtn btn1"> <img src="./assets/add.svg"/></button>
         </div>
-        <img src="./assets/trash.svg" alt="trash" class="trashIcon" id=${
-          item.product_id
-        }/>
+        <img src="./assets/trash.svg" onClick={${removeItem(item.product_id)}} alt="trash" class="trashIcon"/>
       </aside>`;
   });
 };
@@ -186,7 +189,12 @@ const confirmationView = () => {
 };
 // using bigCommerce template language a snippet with CSS and Js need to be called when button is clicked
 
-document.getElementById("quoteTrigger").addEventListener("click", () => {
+document.getElementById("quoteTrigger").addEventListener("click", (e) => {
+  e.stopPropagation()
+  Array.from(document.querySelectorAll(".trashIcon").forEach(trash => {
+    console.log(trash)
+    trash.addEventListener("click", removeItem(trash.id))
+  }))
   document.getElementById("formContainer").style.display = "flex";
   let newItem = getData();
   localStorage.setItem("quoteItems", JSON.stringify(newItem));
