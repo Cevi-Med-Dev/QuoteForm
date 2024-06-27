@@ -1,5 +1,5 @@
 let currentView = 1;
-let shippingArray = [];
+let shippingDataArray = [];
 let quoteArray = JSON.parse(localStorage.getItem("quoteItems")) || [];
 
 const regExpObject = {
@@ -15,9 +15,8 @@ const regExpObject = {
 };
 const error = (input) => {
   input.classList.add("error");
-  input.nextElementSibling.innerHTML = `<img src="./icon-error.svg"/ class="errorImg"> ${input.placeholder} is Invalid`;
+  input.nextElementSibling.innerHTML = `<img src="./assets/icon-error.svg"/ class="errorImg"> ${input.placeholder} is Invalid`;
   input.nextElementSibling.style.display = "flex";
-  document.getElementById("next").disabled = true;
 };
 const approved = (input) => {
   input.classList.remove("error");
@@ -57,6 +56,7 @@ const populateItemsList = (array) => {
 };
 const getData = () => {
   let CM = 2220 + Math.floor(Math.random() * (1 - 100 + 1)) + 9;
+  console.log(CM);
   fetch(
     `https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727`
   )
@@ -71,6 +71,7 @@ const getData = () => {
         (item) => data.items[0].product_id === item.product_id
       ) && quoteArray.push(...data.items);
     });
+  console.log(quoteArray);
   populateItemsList(quoteArray);
   localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
   return quoteArray;
@@ -84,6 +85,7 @@ const itemListView = () => {
   document.getElementById("back").innerText = "Continue Shopping";
   document.getElementById("next").innerText = "Next";
   populateItemsList(getData());
+  document.getElementById("next").disabled = false;
 };
 const shippingFormView = () => {
   document.querySelector(".active").classList.remove("active");
@@ -152,31 +154,28 @@ const shippingFormView = () => {
   Array.from(document.querySelectorAll("input")).forEach((input) => {
     input.addEventListener("focusout", () => {
       let rgx = new RegExp(regExpObject[`${input.name}`]);
-      !rgx.test(input.value) ? error(input) : approved(input);
+      !rgx.test(input.value.trim()) ? error(input) : approved(input);
     });
   });
 };
-const quoteReview = () => {
+const quoteReview = (array) => {
   document.querySelector(".active").classList.remove("active");
   document.querySelector("li#step3").classList.add("active");
-  Array.from(document.querySelectorAll("input")).forEach((input) => {
-    input.value != "" && shippingArray.push(`${input.value}`);
-  });
   document.querySelector("#formHeader h4").innerText = "Review Quote Details";
   document.querySelector("#formHeader img").src = "./assets/three.svg";
   populateItemsList(getData());
   document.getElementById("viewSwitch").innerHTML += `
-    <h6>Destination</h6>
-    <ul>
-    ${shippingArray.join(" <br>")}
-    </ul>
-    `;
+    <h4>Destination</h4>
+    ${array
+      .map((data) => `<span>${data.placeholder} :  ${data.value}</span><br/>`)
+      .join("")}`;
+  console.log(array);
   document.getElementById("next").innerText = "Confirm";
 };
 const confirmationView = () => {
   document.getElementById("formContainer").classList.add("confirmation");
   document.querySelector("#viewSwitch").innerHTML = `<h3>
-    Thank you ${shippingArray[0]} <br>
+    Thank you ${shippingDataArray[0].value} <br>
     You are a step closer to gething exclusive rates <br>
     We will be in contact with you within 72 hours with a quote
     </h3>
@@ -185,7 +184,6 @@ const confirmationView = () => {
   document.getElementById("next").innerText = "Close";
   document.getElementById("steps").style.display = "none";
 };
-
 // using bigCommerce template language a snippet with CSS and Js need to be called when button is clicked
 
 document.getElementById("quoteTrigger").addEventListener("click", () => {
@@ -195,26 +193,45 @@ document.getElementById("quoteTrigger").addEventListener("click", () => {
 });
 
 document.getElementById("next").addEventListener("click", () => {
+  console.log(currentView);
   if (currentView === 1) {
     shippingFormView();
+
     currentView++;
   } else if (currentView === 2) {
-    quoteReview();
-    currentView++;
+    shippingDataArray = [];
+    Array.from(document.querySelectorAll("input"))
+      .splice(0, 1)
+      .forEach((input) => {
+        if (input.value == "") {
+          error(input);
+        } else {
+          shippingDataArray.push(input);
+          approved(input);
+        }
+      });
+
+    !Array.from(document.querySelectorAll("input")).some((input) =>
+      input.classList.contains("error")
+    ) && quoteReview(shippingDataArray),
+      currentView++;
   } else if (currentView === 3) {
     confirmationView();
     currentView++;
   } else if (currentView === 4) {
     document.getElementById("formContainer").style.display = "none";
+    currentView++;
   }
 });
 
 // button works good
 document.getElementById("back").addEventListener("click", () => {
+  console.log(currentView);
   if (currentView === 2) {
     itemListView();
     currentView--;
   } else if (currentView === 3) {
+    console.log(shippingDataArray);
     shippingFormView();
     currentView--;
   }
