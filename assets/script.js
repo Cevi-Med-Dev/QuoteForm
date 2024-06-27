@@ -2,6 +2,7 @@ let currentView = 1;
 let shippingDataArray = [];
 let quoteArray = JSON.parse(localStorage.getItem("quoteItems")) || [];
 
+// Input validation error/approval togglers
 const regExpObject = {
   fName: "^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[s]*)+$",
   lName: "^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[s]*)+$",
@@ -13,7 +14,6 @@ const regExpObject = {
   state: "^[a-zA-Z',.s-]{1,25}$",
   country: "^[a-zA-Z',.s-]{1,25}$",
 };
-// error 
 const error = (input) => {
   input.classList.add("error");
   input.nextElementSibling.innerHTML = `<img src="./assets/icon-error.svg"/ class="errorImg"> ${input.placeholder} is Invalid`;
@@ -21,25 +21,22 @@ const error = (input) => {
 };
 const approved = (input) => {
   input.classList.remove("error");
-  input.style.border = "2px solid green"
-    input.style.color = "green"
+  input.style.border = "2px solid green";
+  input.style.color = "green";
   input.nextElementSibling.style.display = "none";
   document.getElementById("next").disabled = Array.from(
     document.querySelectorAll("#formContainer .errorText")
   ).some((errMsg) => errMsg.style.display === "flex");
 };
+
+//Eliminating a quoted item
 const removeItem = (targetId) => {
-  console.log(
-    "remove",
-    quoteArray,
-    quoteArray.filter((item) => item.product_id != targetId)
-  );
   let filteredArray = quoteArray.filter((item) => item.product_id != targetId);
   localStorage.setItem("quoteItems", JSON.stringify(filteredArray));
 };
+
 //checks stored data and paints accurate list every time
 const populateItemsList = (array) => {
-  console.log("populate");
   document.getElementById("viewSwitch").innerHTML = "";
   array.forEach((item) => {
     document.getElementById("viewSwitch").innerHTML += `
@@ -48,9 +45,19 @@ const populateItemsList = (array) => {
             <img src=${item.image_link} alt="product image">
         </div>
         ${
-          currentView != 3
-            ? `
-       <div id="itemDetails">
+          currentView === 3
+            ? `   
+        <div id="itemDetails">
+            <h4> ${item.title} </h4>
+            <aside>
+              <p>${item.description.substr(0, 50)}...</p>
+            </aside>
+        </div>
+        <div id="quoteBtns">
+          <h3> Qty : ${item.quantity}</h3>
+        </div>`
+            : `
+        <div id="itemDetails">
             <h4>${item.title}</h4>
             <aside>
               <span> Original Price ${item.list_price}</span>
@@ -67,28 +74,21 @@ const populateItemsList = (array) => {
         </div>
         <img src="./assets/trash.svg" id=${item.product_id} alt="trash" class="trashIcon"/>
         `
-            : `   
-        <div id="itemDetails">
-            <h4>${item.title}</h4>
-            <aside>
-              <p>${item.description.substr(0, 50)}...</p>
-            </aside>
-        </div>
-        <div id="quoteBtns">
-          <h3> Qty : ${item.quantity}</h3>
-        </div>`
         }
        
       </aside>`;
   });
+
+  //Uses Id's to eliminate items whos trash is clicked
   document.querySelectorAll(".trashIcon").forEach((trash) => {
     trash.addEventListener("click", () => {
-      console.log("remove by id = ", trash.id);
       removeItem(trash.id);
       quoteArray = JSON.parse(localStorage.getItem("quoteItems"));
       populateItemsList(quoteArray);
     });
   });
+
+  //Increases Qty
   document.querySelectorAll(".add").forEach((addBtn) => {
     addBtn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -96,6 +96,7 @@ const populateItemsList = (array) => {
     });
   });
 
+  //Decreases Qty
   document.querySelectorAll(".remove").forEach((addBtn) => {
     addBtn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -112,7 +113,6 @@ const populateItemsList = (array) => {
 //allows cross tab memory for accurate data persistance even when window is closed
 const getData = () => {
   let CM = 2220 + Math.floor(Math.random() * (1 - 100 + 1)) + 9;
-  console.log(CM);
   fetch(
     `https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727`
   )
@@ -215,7 +215,6 @@ const shippingFormView = () => {
   });
 };
 const quoteReview = (array) => {
-  console.log(array);
   document.querySelector(".active").classList.remove("active");
   document.querySelector("li#step3").classList.add("active");
   document.querySelector("#formHeader h4").innerText = "Review Quote Details";
@@ -245,6 +244,7 @@ const confirmationView = () => {
   document.getElementById("steps").style.display = "none";
 };
 
+//updates quoted items list when a new item is added
 document.getElementById("quoteTrigger").addEventListener("click", (e) => {
   let newItem = getData();
   localStorage.setItem("quoteItems", JSON.stringify(newItem));
@@ -252,13 +252,14 @@ document.getElementById("quoteTrigger").addEventListener("click", (e) => {
   populateItemsList(quoteArray);
 });
 
+//toggles screen views on User Interface upon Next button click
 document.getElementById("next").addEventListener("click", () => {
   if (currentView === 1) {
     currentView++;
     shippingFormView();
   } else if (currentView === 2) {
     shippingDataArray = [];
-    //here is where we can decide what inputs are necessary or not to move forward - ask Simon 
+    //Can decide what inputs are necessary - ask Simon - 6 recommended - atm only ask for first name
     Array.from(document.querySelectorAll("input")).forEach((input) => {
       if (input.value == "" && input.id === "fName") {
         error(input);
@@ -267,31 +268,29 @@ document.getElementById("next").addEventListener("click", () => {
         approved(input);
       }
     });
-
-    //checks for typos and notifies user 
+    //Runs through every input && checks for typos then visually notifies user
     !Array.from(document.querySelectorAll("input")).some((input) =>
-            input.classList.contains("error")
-          ) && currentView++,
-            quoteReview(shippingDataArray);
-      } else if (currentView === 3) {
-            currentView++;
-            confirmationView();
-      } else if (currentView === 4) {
-          document.getElementById("formContainer").style.display = "none";
-          currentView++;
+      input.classList.contains("error")
+    ) && currentView++, quoteReview(shippingDataArray);
+  } else if (currentView === 3) {
+    confirmationView();
+    currentView++;
+  } else if (currentView === 4) {
+    document.getElementById("formContainer").style.display = "none";
+    currentView++;
   }
 });
 
+//toggles screen views on User Interface upon Back button click
 document.getElementById("back").addEventListener("click", () => {
-  console.log(currentView);
   if (currentView === 2) {
-    console.log("item list");
+    currentView--;
     itemListView();
-    currentView--;
   } else if (currentView === 3) {
-    console.log(shippingDataArray);
-    shippingFormView();
     currentView--;
+    shippingFormView();
+  } else if (currentView === 1) {
+    document.getElementById("formContainer").style.display = "none";
   }
 });
 
