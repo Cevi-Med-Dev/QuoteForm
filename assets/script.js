@@ -13,6 +13,7 @@ const regExpObject = {
   state: "^[a-zA-Z',.s-]{1,25}$",
   country: "^[a-zA-Z',.s-]{1,25}$",
 };
+// error 
 const error = (input) => {
   input.classList.add("error");
   input.nextElementSibling.innerHTML = `<img src="./assets/icon-error.svg"/ class="errorImg"> ${input.placeholder} is Invalid`;
@@ -20,6 +21,8 @@ const error = (input) => {
 };
 const approved = (input) => {
   input.classList.remove("error");
+  input.style.border = "2px solid green"
+    input.style.color = "green"
   input.nextElementSibling.style.display = "none";
   document.getElementById("next").disabled = Array.from(
     document.querySelectorAll("#formContainer .errorText")
@@ -34,6 +37,7 @@ const removeItem = (targetId) => {
   let filteredArray = quoteArray.filter((item) => item.product_id != targetId);
   localStorage.setItem("quoteItems", JSON.stringify(filteredArray));
 };
+//checks stored data and paints accurate list every time
 const populateItemsList = (array) => {
   console.log("populate");
   document.getElementById("viewSwitch").innerHTML = "";
@@ -51,23 +55,17 @@ const populateItemsList = (array) => {
             <aside>
               <span> Original Price ${item.list_price}</span>
               <br/>
-              <p>${item.description}</p>
+              <p> ${item.description}</p>
               <br/>
               <a targetIdlank" href=${item.link}> Product Details </a>
             </aside>
         </div>
         <div id="quoteBtns">
-            <button class="qtyBtn btn1 remove"><img id=${
-              item.product_id
-            } src="./assets/remove.svg"/> </button>
+            <button class="qtyBtn btn1 remove"><img id=${item.product_id} src="./assets/remove.svg"/> </button>
             <small>${item.quantity}</small>
-            <button class="qtyBtn btn1 add"> <img id=${
-              item.product_id
-            } src="./assets/add.svg"/></button>
+            <button class="qtyBtn btn1 add"> <img id=${item.product_id} src="./assets/add.svg"/></button>
         </div>
-        <img src="./assets/trash.svg" id=${
-          item.product_id
-        } alt="trash" class="trashIcon"/>
+        <img src="./assets/trash.svg" id=${item.product_id} alt="trash" class="trashIcon"/>
         `
             : `   
         <div id="itemDetails">
@@ -110,6 +108,8 @@ const populateItemsList = (array) => {
     });
   });
 };
+
+//allows cross tab memory for accurate data persistance even when window is closed
 const getData = () => {
   let CM = 2220 + Math.floor(Math.random() * (1 - 100 + 1)) + 9;
   console.log(CM);
@@ -131,6 +131,8 @@ const getData = () => {
   localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
   return quoteArray;
 };
+
+//View changes SPA feature
 const itemListView = () => {
   document.querySelector(".active").classList.remove("active");
   document.querySelector("li#step1").classList.add("active");
@@ -256,7 +258,7 @@ document.getElementById("next").addEventListener("click", () => {
     shippingFormView();
   } else if (currentView === 2) {
     shippingDataArray = [];
-    //for each one take the value add to a local storage key value called to populate information they have used
+    //here is where we can decide what inputs are necessary or not to move forward - ask Simon 
     Array.from(document.querySelectorAll("input")).forEach((input) => {
       if (input.value == "" && input.id === "fName") {
         error(input);
@@ -266,16 +268,17 @@ document.getElementById("next").addEventListener("click", () => {
       }
     });
 
+    //checks for typos and notifies user 
     !Array.from(document.querySelectorAll("input")).some((input) =>
-      input.classList.contains("error")
-    ) && currentView++,
-      quoteReview(shippingDataArray);
-  } else if (currentView === 3) {
-    currentView++;
-    confirmationView();
-  } else if (currentView === 4) {
-    document.getElementById("formContainer").style.display = "none";
-    currentView++;
+            input.classList.contains("error")
+          ) && currentView++,
+            quoteReview(shippingDataArray);
+      } else if (currentView === 3) {
+            currentView++;
+            confirmationView();
+      } else if (currentView === 4) {
+          document.getElementById("formContainer").style.display = "none";
+          currentView++;
   }
 });
 

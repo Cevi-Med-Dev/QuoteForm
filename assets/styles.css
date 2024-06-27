@@ -232,6 +232,10 @@ div#quoteBtns button.qtyBtn {
 div#quoteBtns button.qtyBtn img {
     width: 10px;
 }
+div#quoteBtns h3{
+    width: max-content;
+    color: #C40C11;
+}
 
 div#quoteBtns .btn1:hover{
     background-color: white !important;
