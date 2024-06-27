@@ -214,8 +214,6 @@ const shippingFormView = (array) => {
               </div>`;
   document.getElementById("back").innerText = "Back";
   document.getElementById("next").innerText = "next";
-
-  console.log(array);
   Array.from(document.querySelectorAll("input")).forEach((input) => {
     input.addEventListener("focusout", () => {
       let rgx = new RegExp(regExpObject[`${input.name}`]);
@@ -268,6 +266,7 @@ document.getElementById("next").addEventListener("click", () => {
     shippingFormView();
   } else if (currentView === 2) {
     shippingDataArray = [];
+
     //Can decide what inputs are necessary - ask Simon - 6 recommended - atm only ask for first name
     Array.from(document.querySelectorAll("input")).forEach((input) => {
       if (input.value == "" && input.id === "fName") {
@@ -283,6 +282,7 @@ document.getElementById("next").addEventListener("click", () => {
       input.classList.contains("error")
     ) && currentView++,
       quoteReview(shippingDataArray);
+      console.log(currentView)
   } else if (currentView === 3) {
     confirmationView();
     currentView++;
