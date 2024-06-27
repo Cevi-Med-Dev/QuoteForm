@@ -91,29 +91,34 @@ const populateItemsList = (array) => {
   document.querySelectorAll(".add").forEach((addBtn) => {
     addBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      quoteArray.find(item => item.product_id === e.target.id).quantity = Number(quoteArray.find(item => item.product_id === e.target.id).quantity) + 1
+      let itemSelected = quoteArray.find(
+        (item) => item.product_id === e.target.id
+      );
+      itemSelected.quantity = Number(itemSelected.quantity) + 1;
       localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
-      populateItemsList(quoteArray)
+      populateItemsList(quoteArray);
     });
   });
 
   //Decreases Qty
-  document.querySelectorAll(".remove").forEach((addBtn) => {
-    addBtn.addEventListener("click", (e) => {
+  document.querySelectorAll(".remove").forEach((dltBtn) => {
+    dltBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log(
-        "decrement qty = ",
-        e.target.id,
-        addBtn,
-        quoteArray.filter((item) => item.product_id === `${e.target.id}`)
+      let itemSelected = quoteArray.find(
+        (item) => item.product_id === e.target.id
       );
+      itemSelected.quantity > 0 && itemSelected.quantity < 2
+        ? removeItem(itemSelected.product_id)
+        : (itemSelected.quantity = Number(itemSelected.quantity) - 1);
       localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
+      populateItemsList(quoteArray);
     });
   });
 };
 
 //allows cross tab memory for accurate data persistance even when window is closed
 const getData = () => {
+  console.log("new item fetched");
   let CM = 2220 + Math.floor(Math.random() * (1 - 100 + 1)) + 9;
   fetch(
     `https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727`
@@ -146,69 +151,71 @@ const itemListView = () => {
   populateItemsList(quoteArray);
   document.getElementById("next").disabled = false;
 };
-const shippingFormView = () => {
+const shippingFormView = (array) => {
   document.querySelector(".active").classList.remove("active");
   document.querySelector("li#step2").classList.add("active");
   document.querySelector("#formHeader h4").innerText =
     "Please fill out  Shipping Information ";
   document.querySelector("#formHeader img").src = "./assets/two.svg";
   document.getElementById("viewSwitch").innerHTML = `<div class="fields">
-              <div>
-                  <label for="fName">First name:</label>
-                  <input type="text" id="fName" name="fName" placeholder="First name">
-                  <span class="errorText" style="display: none"></span>
-              </div>
-              <div>
-                  <label for="lName">Last name:</label>
-                  <input type="text" id="lName" name="lName" placeholder="Last name">
-             <span class="errorText" style="display: none"></span>
+  <div>
+  <label for="fName">First name:</label>
+  <input value="${array === undefined ? "" : array[0].value}" type="text" id="fName" name="fName" placeholder="First name">
+  <span class="errorText" style="display: none"></span>
+  </div>
+  <div>
+  <label for="lName">Last name:</label>
+  <input value="${array === undefined ? "" : array[1].value}" type="text" id="lName" name="lName" placeholder="Last name">
+  <span class="errorText" style="display: none"></span>
                   </div>
           </div>
           <div class="fields">
               <div>
                   <label for="phone">Phone Number</label>
-                  <input type="tel" id="phone" name="phone" placeholder="Phone Number">
+                  <input value="${array === undefined ? "" : array[2].value}" type="tel" id="phone" name="phone" placeholder="Phone Number">
              <span class="errorText" style="display: none"></span>
                   </div>
-              <div>
+                  <div>
                   <label for="email">Email</label>
-                  <input type="email" id="email" name="email" placeholder="Email Address">
+                  <input value="${array === undefined ? "" : array[3].value}" type="email" id="email" name="email" placeholder="Email Address">
+             <span class="errorText" style="display: none"></span>
+                  </div>
+                  </div>
+                  <div class="fields">
+              <div>
+              <label for="address"> Shipping Address</label>
+                  <input value="${array === undefined ? "" : array[4].value}" type="text" id="address" name="address" placeholder="Address">
              <span class="errorText" style="display: none"></span>
                   </div>
           </div>
           <div class="fields">
               <div>
-                  <label for="address"> Shipping Address</label>
-                  <input type="text" id="address" name="address" placeholder="Address">
-             <span class="errorText" style="display: none"></span>
-                  </div>
-          </div>
-          <div class="fields">
+              <label for="zCode">Zip Code</label>
+              <input value="${array === undefined ? "" : array[5].value}" type="text" id="zCode" name="zCode" placeholder="Zip Code ">
+              <span class="errorText" style="display: none"></span>
+              </div>
               <div>
-                  <label for="zCode">Zip Code</label>
-                  <input type="number" id="zCode" name="zCode" placeholder="Zip Code ">
-             <span class="errorText" style="display: none"></span>
-                  </div>
+              <label for="city"> City</label>
+              <input value="${array === undefined ? "" : array[6].value}" type="text" id="city" name="city" placeholder="City ">
+              <span class="errorText" style="display: none"></span>
+              </div>
+              </div>
+              <div class="fields">
               <div>
-                  <label for="city"> City</label>
-                  <input type="text" id="city" name="city" placeholder="City ">
-             <span class="errorText" style="display: none"></span>
-                  </div>
-          </div>
-          <div class="fields">
+              <label for="state">State </label>
+              <input value="${array === undefined ? "" : array[7].value}" type="text" id="state" name="state" placeholder="State ">
+              <span class="errorText" style="display: none"></span>
+              </div>
               <div>
-                  <label for="state">State </label>
-                  <input type="text" id="state" name="state" placeholder="State ">
-             <span class="errorText" style="display: none"></span>
-                  </div>
-              <div>
-                  <label for="country">Country </label>
-                  <input type="text" id="country" name="country" placeholder="Country ">
-             <span class="errorText" style="display: none"></span>
-                  </div>
-          </div>`;
+              <label for="country">Country </label>
+              <input value="${array === undefined ? "" : array[8].value}" type="text" id="country" name="country" placeholder="Country ">
+              <span class="errorText" style="display: none"></span>
+              </div>
+              </div>`;
   document.getElementById("back").innerText = "Back";
   document.getElementById("next").innerText = "next";
+
+  console.log(array);
   Array.from(document.querySelectorAll("input")).forEach((input) => {
     input.addEventListener("focusout", () => {
       let rgx = new RegExp(regExpObject[`${input.name}`]);
@@ -236,7 +243,7 @@ const quoteReview = (array) => {
 const confirmationView = () => {
   document.getElementById("formContainer").classList.add("confirmation");
   document.querySelector("#viewSwitch").innerHTML = `<h3>
-    Thank you ${shippingDataArray[0].value} <br>
+    Thank you ${shippingDataArray[0].value } ${shippingDataArray[1].value }<br>
     You are a step closer to gething exclusive rates <br>
     We will be in contact with you within 72 hours with a quote
     </h3>
@@ -292,7 +299,7 @@ document.getElementById("back").addEventListener("click", () => {
     itemListView();
   } else if (currentView === 3) {
     currentView--;
-    shippingFormView();
+    shippingFormView(shippingDataArray);
   } else if (currentView === 1) {
     document.getElementById("formContainer").style.display = "none";
   }
