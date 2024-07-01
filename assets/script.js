@@ -119,10 +119,10 @@ const populateItemsList = (array) => {
 //allows cross tab memory for accurate data persistance even when window is closed
 const getData = () => {
   console.log("new item fetched");
-  let CM = 2220 + Math.floor(Math.random() * (1 - 100 + 1)) + 9;
-  fetch(
-    `https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727`
-  )
+  let CM = 51803; //+ Math.floor(Math.random() * (1 - 100 + 1)) + 9;
+  fetch(`
+    https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727
+  `)
     .then((response) => response.text())
     .then((data) => {
       first_subs = data.substring(40);
@@ -133,12 +133,13 @@ const getData = () => {
       !quoteArray.some(
         (item) => data.items[0].product_id === item.product_id
       ) && quoteArray.push(...data.items);
-    });
-  populateItemsList(quoteArray);
-  localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
+    }).then(() => {
+    localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
+    populateItemsList(quoteArray);
+  });
+  
   return quoteArray;
 };
-
 //View change - SPA feature
 const itemListView = () => {
   document.querySelector(".active").classList.remove("active");
