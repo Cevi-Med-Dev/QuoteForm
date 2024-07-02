@@ -1,7 +1,7 @@
 let currentView = 1;
 let shippingDataArray = [];
 let quoteArray = JSON.parse(localStorage.getItem("quoteItems")) || [];
-
+let shippingInfoObject = {};
 // Input validation error/approval togglers
 const regExpObject = {
   fName: "^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[s]*)+$",
@@ -133,13 +133,37 @@ const getData = () => {
       !quoteArray.some(
         (item) => data.items[0].product_id === item.product_id
       ) && quoteArray.push(...data.items);
-    }).then(() => {
-    localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
-    populateItemsList(quoteArray);
-  });
-  
+    })
+    .then(() => {
+      localStorage.setItem("quoteItems", JSON.stringify(quoteArray));
+      populateItemsList(quoteArray);
+    });
+
   return quoteArray;
 };
+
+//send data in object form to Airtable
+async function postData(url = "", data = {}) {
+  const response = await fetch(url, {
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    type: "jsonp",
+    headers: {
+      "Content-Type": "application/json",
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: "follow", // manual, *follow, error
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(data), // body data type must match "Content-Type" header
+  });
+  return response.json(); // parses JSON response into native JavaScript objects
+}
+
+// Send trigger
+postData({}).then((data) => {});
+
 //View change - SPA feature
 const itemListView = () => {
   document.querySelector(".active").classList.remove("active");
@@ -159,60 +183,79 @@ const shippingFormView = (array) => {
     "Please fill out  Shipping Information ";
   document.querySelector("#formHeader img").src = "./assets/two.svg";
   document.getElementById("viewSwitch").innerHTML = `<div class="fields">
-  <div>
-  <label for="fName">First name:</label>
-  <input value="${array === undefined ? "" : array[0].value}" type="text" id="fName" name="fName" placeholder="First name">
-  <span class="errorText" style="display: none"></span>
-  </div>
-  <div>
-  <label for="lName">Last name:</label>
-  <input value="${array === undefined ? "" : array[1].value}" type="text" id="lName" name="lName" placeholder="Last name">
-  <span class="errorText" style="display: none"></span>
+          <div>
+                <label for="fName">First name:</label>
+                <input value="${
+                  array === undefined ? "" : array[0].value
+                }" type="text" id="fName" name="fName" placeholder="First name">
+                <span class="errorText" style="display: none"></span>
+                </div>
+                <div>
+                <label for="lName">Last name:</label>
+                <input value="${
+                  array === undefined ? "" : array[1].value
+                }" type="text" id="lName" name="lName" placeholder="Last name">
+                <span class="errorText" style="display: none"></span>
                   </div>
           </div>
           <div class="fields">
               <div>
                   <label for="phone">Phone Number</label>
-                  <input value="${array === undefined ? "" : array[2].value}" type="tel" id="phone" name="phone" placeholder="Phone Number">
+                  <input value="${
+                    array === undefined ? "" : array[2].value
+                  }" type="tel" id="phone" name="phone" placeholder="Phone Number">
              <span class="errorText" style="display: none"></span>
                   </div>
                   <div>
                   <label for="email">Email</label>
-                  <input value="${array === undefined ? "" : array[3].value}" type="email" id="email" name="email" placeholder="Email Address">
+                  <input value="${
+                    array === undefined ? "" : array[3].value
+                  }" type="email" id="email" name="email" placeholder="Email Address">
              <span class="errorText" style="display: none"></span>
                   </div>
                   </div>
                   <div class="fields">
               <div>
               <label for="address"> Shipping Address</label>
-                  <input value="${array === undefined ? "" : array[4].value}" type="text" id="address" name="address" placeholder="Address">
+                  <input value="${
+                    array === undefined ? "" : array[4].value
+                  }" type="text" id="address" name="address" placeholder="Address">
              <span class="errorText" style="display: none"></span>
                   </div>
           </div>
+
           <div class="fields">
               <div>
               <label for="zCode">Zip Code</label>
-              <input value="${array === undefined ? "" : array[5].value}" type="text" id="zCode" name="zCode" placeholder="Zip Code ">
+              <input value="${
+                array === undefined ? "" : array[5].value
+              }" type="text" id="zCode" name="zCode" placeholder="Zip Code ">
               <span class="errorText" style="display: none"></span>
               </div>
               <div>
               <label for="city"> City</label>
-              <input value="${array === undefined ? "" : array[6].value}" type="text" id="city" name="city" placeholder="City ">
+              <input value="${
+                array === undefined ? "" : array[6].value
+              }" type="text" id="city" name="city" placeholder="City ">
               <span class="errorText" style="display: none"></span>
               </div>
               </div>
               <div class="fields">
               <div>
               <label for="state">State </label>
-              <input value="${array === undefined ? "" : array[7].value}" type="text" id="state" name="state" placeholder="State ">
+              <input value="${
+                array === undefined ? "" : array[7].value
+              }" type="text" id="state" name="state" placeholder="State ">
               <span class="errorText" style="display: none"></span>
               </div>
               <div>
               <label for="country">Country </label>
-              <input value="${array === undefined ? "" : array[8].value}" type="text" id="country" name="country" placeholder="Country ">
+              <input value="${
+                array === undefined ? "" : array[8].value
+              }" type="text" id="country" name="country" placeholder="Country ">
               <span class="errorText" style="display: none"></span>
-              </div>
-              </div>`;
+          </div>
+        </div>`;
   document.getElementById("back").innerText = "Back";
   document.getElementById("next").innerText = "next";
   Array.from(document.querySelectorAll("input")).forEach((input) => {
@@ -227,8 +270,18 @@ const quoteReview = (array) => {
   document.querySelector("li#step3").classList.add("active");
   document.querySelector("#formHeader h4").innerText = "Review Quote Details";
   document.querySelector("#formHeader img").src = "./assets/three.svg";
+  document.querySelector("div.btns").style.display = "none !important";
   quoteArray = JSON.parse(localStorage.getItem("quoteItems"));
+  shippingInfoObject = {};
+  shippingDataArray.forEach((input) => {
+    shippingInfoObject[`${input.name}`] = `${input.value}`;
+  });
+  shippingInfoObject = quoteArray.concat(shippingInfoObject);
+
+  //items listed
   populateItemsList(quoteArray);
+
+  //Shipping info
   document.getElementById("viewSwitch").innerHTML += `
     <h4>Destination</h4>
     ${array
@@ -236,13 +289,14 @@ const quoteReview = (array) => {
         (data) =>
           data.value && `<span> ${data.placeholder} : ${data.value}</span><br/>`
       )
-      .join("")}`;
-  document.getElementById("next").innerText = "Confirm";
+      .join("")}
+    <br/>`;
+    document.getElementById("next").innerText = "Send";
 };
 const confirmationView = () => {
   document.getElementById("formContainer").classList.add("confirmation");
   document.querySelector("#viewSwitch").innerHTML = `<h3>
-    Thank you ${shippingDataArray[0].value } ${shippingDataArray[1].value }<br>
+    Thank you ${shippingDataArray[0].value} ${shippingDataArray[1].value}<br>
     You are a step closer to gething exclusive rates <br>
     We will be in contact with you within 72 hours with a quote
     </h3>
@@ -250,6 +304,7 @@ const confirmationView = () => {
   document.getElementById("back").style.display = "none";
   document.getElementById("next").innerText = "Close";
   document.getElementById("steps").style.display = "none";
+  document.getElementById("");
 };
 
 //updates quoted items list when a new item is added
@@ -283,7 +338,17 @@ document.getElementById("next").addEventListener("click", () => {
       input.classList.contains("error")
     ) && currentView++,
       quoteReview(shippingDataArray);
-      console.log(currentView)
+    document.getElementById("next").addEventListener(
+      "click",
+      postData(
+        "https://hooks.airtable.com/workflows/v1/genericWebhook/appi0FYLXUm0K6RqJ/wflMJtlWnopIkAxUG/wtrGuQFtO9eVRLxA7",
+        quoteArray.concat(shippingInfoObject)
+      ).then((data) => {
+        console.log(data);
+      }),
+      true
+    );
+    console.log(currentView);
   } else if (currentView === 3) {
     confirmationView();
     currentView++;
@@ -300,6 +365,9 @@ document.getElementById("back").addEventListener("click", () => {
     itemListView();
   } else if (currentView === 3) {
     currentView--;
+    document
+      .getElementById("next")
+      .removeEventListener("click", postData, true);
     shippingFormView(shippingDataArray);
   } else if (currentView === 1) {
     document.getElementById("formContainer").style.display = "none";
