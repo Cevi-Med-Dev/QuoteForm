@@ -154,6 +154,7 @@ async function postData(url = "", data = "") {
     },
     body: data, // body data type must match "Content-Type" header
   });
+  //clear data for next quote 
   return response; // parses JSON response into native JavaScript objects
 }
 
@@ -164,11 +165,8 @@ Object.keys(shippingInfoObject[1]).forEach((el) => {
   makeQ += `${el}=${shippingInfoObject[1][el]}&`;
 });
 shippingInfoObject[0].forEach((item) => {
-  makeQ += `name=${item.title}&CM=${item.product_code}&Qty=${item.quantity}`
+  makeQ += `name=${item.title}&CM=${item.product_code}&Qty=${item.quantity}&`
 });
-postData(
-  "https://hooks.airtable.com/workflows/v1/genericWebhook/appi0FYLXUm0K6RqJ/wflMJtlWnopIkAxUG/wtrGuQFtO9eVRLxA7", makeQ
-)
 }
 
 //View change - SPA feature
@@ -334,6 +332,7 @@ document.getElementById("next").addEventListener("click", () => {
     Array.from(document.querySelectorAll("input")).forEach((input) => {
       if (input.value == "" && input.name == "fName") {
         error(input);
+        document.getElementById("next").removeEventListener("click", sendQuote);
       } else {
         shippingDataArray.push(input);
         approved(input);
@@ -368,9 +367,7 @@ document.getElementById("back").addEventListener("click", () => {
   } else if (currentView === 3) {
     console.log(currentView)
     currentView--;
-    document
-      .getElementById("next")
-      .removeEventListener("click", sendQuote);
+    document.getElementById("next").removeEventListener("click", sendQuote);
     shippingFormView(shippingDataArray);
   } else if (currentView === 1) {
     document.getElementById("formContainer").style.display = "none";
