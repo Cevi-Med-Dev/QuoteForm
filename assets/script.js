@@ -119,7 +119,7 @@ const populateItemsList = (array) => {
 //allows cross tab memory for accurate data persistance even when window is closed
 const getData = () => {
   console.log("new item fetched");
-  let CM = 51803; //+ Math.floor(Math.random() * (1 - 100 + 1)) + 9;
+  let CM = 518 + Math.floor(Math.random() * (1 - 100 + 1)) + 9;
   fetch(`
     https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727
   `)
@@ -143,26 +143,21 @@ const getData = () => {
 };
 
 //send data in object form to Airtable
-async function postData(url = "", data = {}) {
+async function postData(url = "", data = '') {
   const response = await fetch(url, {
-    method: "post",
-    mode: "cors",
+    method: "POST",
     cache: "no-cache",
-    credentials: "same-origin",
-    type: "jsonp",
+    mode: 'no-cors',
     headers: {
-      "Content-Type": "application/json",
-      // 'Content-Type': 'application/x-www-form-urlencoded',
+    'Content-Type': 'application/x-www-form-urlencoded',
     },
-    redirect: "follow", // manual, *follow, error
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(data), // body data type must match "Content-Type" header
+    body: data, // body data type must match "Content-Type" header
   });
-  return response.json(); // parses JSON response into native JavaScript objects
+  return response; // parses JSON response into native JavaScript objects
 }
 
-// Send trigger
-postData({}).then((data) => {});
+// // Send trigger
+// postData({}).then((data) => {});
 
 //View change - SPA feature
 const itemListView = () => {
@@ -276,7 +271,7 @@ const quoteReview = (array) => {
   shippingDataArray.forEach((input) => {
     shippingInfoObject[`${input.name}`] = `${input.value}`;
   });
-  shippingInfoObject = quoteArray.concat(shippingInfoObject);
+  shippingInfoObject = [Array.from(quoteArray)].concat(shippingInfoObject);
 
   //items listed
   populateItemsList(quoteArray);
@@ -338,16 +333,25 @@ document.getElementById("next").addEventListener("click", () => {
       input.classList.contains("error")
     ) && currentView++,
       quoteReview(shippingDataArray);
-    document.getElementById("next").addEventListener(
-      "click",
-      postData(
-        "https://hooks.airtable.com/workflows/v1/genericWebhook/appi0FYLXUm0K6RqJ/wflMJtlWnopIkAxUG/wtrGuQFtO9eVRLxA7",
-        quoteArray.concat(shippingInfoObject)
-      ).then((data) => {
-        console.log(data);
-      }),
-      true
-    );
+      document.querySelector("#viewSwitch").parentElement.querySelector('#next').addEventListener("click", () => {
+        // Join params
+        let makeQ = '';
+        Object.keys(shippingInfoObject[1]).forEach(el => {
+            makeQ += `${el}=${shippingInfoObject[1][el]}&`
+        })
+
+        Object.keys(shippingInfoObject[0]).forEach(el => {
+          makeQ += `${el}=${shippingInfoObject[1][el]}&`
+      })
+
+        // Send Data
+        postData(
+          "https://hooks.airtable.com/workflows/v1/genericWebhook/appi0FYLXUm0K6RqJ/wflMJtlWnopIkAxUG/wtrGuQFtO9eVRLxA7", makeQ
+        ).then((data) => {
+          console.log(data);
+        })
+
+       });
     console.log(currentView);
   } else if (currentView === 3) {
     confirmationView();
