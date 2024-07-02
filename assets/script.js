@@ -2,6 +2,7 @@ let currentView = 1;
 let shippingDataArray = [];
 let quoteArray = JSON.parse(localStorage.getItem("quoteItems")) || [];
 let shippingInfoObject = {};
+
 // Input validation error/approval togglers
 const regExpObject = {
   fName: "^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[s]*)+$",
@@ -143,13 +144,13 @@ const getData = () => {
 };
 
 //send data in object form to Airtable
-async function postData(url = "", data = '') {
+async function postData(url = "", data = "") {
   const response = await fetch(url, {
     method: "POST",
     cache: "no-cache",
-    mode: 'no-cors',
+    mode: "no-cors",
     headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     body: data, // body data type must match "Content-Type" header
   });
@@ -157,7 +158,18 @@ async function postData(url = "", data = '') {
 }
 
 // // Send trigger
-// postData({}).then((data) => {});
+let sendQuote = () => {
+let makeQ = "";
+Object.keys(shippingInfoObject[1]).forEach((el) => {
+  makeQ += `${el}=${shippingInfoObject[1][el]}&`;
+});
+shippingInfoObject[0].forEach((item) => {
+  makeQ += `name=${item.title}&CM=${item.product_code}&Qty=${item.quantity}`
+});
+postData(
+  "https://hooks.airtable.com/workflows/v1/genericWebhook/appi0FYLXUm0K6RqJ/wflMJtlWnopIkAxUG/wtrGuQFtO9eVRLxA7", makeQ
+)
+}
 
 //View change - SPA feature
 const itemListView = () => {
@@ -286,7 +298,7 @@ const quoteReview = (array) => {
       )
       .join("")}
     <br/>`;
-    document.getElementById("next").innerText = "Send";
+  document.getElementById("next").innerText = "Send";
 };
 const confirmationView = () => {
   document.getElementById("formContainer").classList.add("confirmation");
@@ -320,7 +332,7 @@ document.getElementById("next").addEventListener("click", () => {
 
     //Can decide what inputs are necessary - ask Simon - 6 recommended - atm only ask for first name
     Array.from(document.querySelectorAll("input")).forEach((input) => {
-      if (input.value == "" && input.id === "fName") {
+      if (input.value == "" && input.name == "fName") {
         error(input);
       } else {
         shippingDataArray.push(input);
@@ -333,25 +345,11 @@ document.getElementById("next").addEventListener("click", () => {
       input.classList.contains("error")
     ) && currentView++,
       quoteReview(shippingDataArray);
-      document.querySelector("#viewSwitch").parentElement.querySelector('#next').addEventListener("click", () => {
-        // Join params
-        let makeQ = '';
-        Object.keys(shippingInfoObject[1]).forEach(el => {
-            makeQ += `${el}=${shippingInfoObject[1][el]}&`
-        })
+    document
+      .querySelector("#viewSwitch")
+      .parentElement.querySelector("#next")
 
-        Object.keys(shippingInfoObject[0]).forEach(el => {
-          makeQ += `${el}=${shippingInfoObject[1][el]}&`
-      })
-
-        // Send Data
-        postData(
-          "https://hooks.airtable.com/workflows/v1/genericWebhook/appi0FYLXUm0K6RqJ/wflMJtlWnopIkAxUG/wtrGuQFtO9eVRLxA7", makeQ
-        ).then((data) => {
-          console.log(data);
-        })
-
-       });
+      .addEventListener("click", sendQuote);
     console.log(currentView);
   } else if (currentView === 3) {
     confirmationView();
@@ -368,10 +366,11 @@ document.getElementById("back").addEventListener("click", () => {
     currentView--;
     itemListView();
   } else if (currentView === 3) {
+    console.log(currentView)
     currentView--;
     document
       .getElementById("next")
-      .removeEventListener("click", postData, true);
+      .removeEventListener("click", sendQuote);
     shippingFormView(shippingDataArray);
   } else if (currentView === 1) {
     document.getElementById("formContainer").style.display = "none";
