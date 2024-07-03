@@ -2,7 +2,6 @@ let currentView = 1;
 let shippingDataArray = [];
 let quoteArray = JSON.parse(localStorage.getItem("quoteItems")) || [];
 let shippingInfoObject = {};
-
 // Input validation error/approval togglers
 const regExpObject = {
   fName: "^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[s]*)+$",
@@ -120,7 +119,7 @@ const populateItemsList = (array) => {
 //allows cross tab memory for accurate data persistance even when window is closed
 const getData = () => {
   console.log("new item fetched");
-  let CM = 518 + Math.floor(Math.random() * (1 - 100 + 1)) + 9;
+  let CM = 142 + Math.floor(Math.random() * (1 - 100 + 1)) + 9;
   fetch(`
     https://searchserverapi.com/getwidgets?api_key=5c9E0E4f0q&q=cm${CM}&maxResults=12&startIndex=0&items=true&pages=true&facets=false&categories=true&suggestions=true&vendors=false&tags=false&pageStartIndex=0&pagesMaxResults=10&categoryStartIndex=0&categoriesMaxResults=10&suggestionsMaxResults=4&CustomerGroupId=0&recentlyViewedProducts=&recentlyAddedToCartProducts=&recentlyPurchasedProducts=&vendorsMaxResults=3&tagsMaxResults=3&output=jsonp&callback=jQuery3600586473215199615_1719243771726&_=1719243771727
   `)
@@ -144,30 +143,21 @@ const getData = () => {
 };
 
 //send data in object form to Airtable
-async function postData(url = "", data = "") {
+async function postData(url = "", data = '') {
   const response = await fetch(url, {
     method: "POST",
     cache: "no-cache",
-    mode: "no-cors",
+    mode: 'no-cors',
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+    'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: data, // body data type must match "Content-Type" header
   });
-  //clear data for next quote 
   return response; // parses JSON response into native JavaScript objects
 }
 
 // // Send trigger
-let sendQuote = () => {
-let makeQ = "";
-Object.keys(shippingInfoObject[1]).forEach((el) => {
-  makeQ += `${el}=${shippingInfoObject[1][el]}&`;
-});
-shippingInfoObject[0].forEach((item) => {
-  makeQ += `name=${item.title}&CM=${item.product_code}&Qty=${item.quantity}&`
-});
-}
+// postData({}).then((data) => {});
 
 //View change - SPA feature
 const itemListView = () => {
@@ -296,7 +286,7 @@ const quoteReview = (array) => {
       )
       .join("")}
     <br/>`;
-  document.getElementById("next").innerText = "Send";
+    document.getElementById("next").innerText = "Send";
 };
 const confirmationView = () => {
   document.getElementById("formContainer").classList.add("confirmation");
@@ -330,9 +320,8 @@ document.getElementById("next").addEventListener("click", () => {
 
     //Can decide what inputs are necessary - ask Simon - 6 recommended - atm only ask for first name
     Array.from(document.querySelectorAll("input")).forEach((input) => {
-      if (input.value == "" && input.name == "fName") {
+      if (input.value == "" && input.id === "fName") {
         error(input);
-        document.getElementById("next").removeEventListener("click", sendQuote);
       } else {
         shippingDataArray.push(input);
         approved(input);
@@ -344,11 +333,28 @@ document.getElementById("next").addEventListener("click", () => {
       input.classList.contains("error")
     ) && currentView++,
       quoteReview(shippingDataArray);
-    document
-      .querySelector("#viewSwitch")
-      .parentElement.querySelector("#next")
+      document.querySelector("#viewSwitch").parentElement.querySelector('#next').addEventListener("click", () => {
+        // Join params
+        let makeQ = '';
+        Object.keys(shippingInfoObject[1]).forEach(el => {
+            makeQ += `${el}=${shippingInfoObject[1][el]}&`
+        })
+        
+        let items = ''
+        shippingInfoObject[0].forEach((item) => {
+          items += `name: ${item.title}, CM: ${item.product_code}, Qty: ${item.quantity}, \n`;
+        });
 
-      .addEventListener("click", sendQuote);
+        makeQ += `items=${items}`
+
+        // Send Data
+        postData(
+          "https://hooks.airtable.com/workflows/v1/genericWebhook/appi0FYLXUm0K6RqJ/wflMJtlWnopIkAxUG/wtrGuQFtO9eVRLxA7", makeQ
+        ).then((data) => {
+          console.log(data);
+        })
+
+       });
     console.log(currentView);
   } else if (currentView === 3) {
     confirmationView();
@@ -365,9 +371,10 @@ document.getElementById("back").addEventListener("click", () => {
     currentView--;
     itemListView();
   } else if (currentView === 3) {
-    console.log(currentView)
     currentView--;
-    document.getElementById("next").removeEventListener("click", sendQuote);
+    document
+      .getElementById("next")
+      .removeEventListener("click", postData, true);
     shippingFormView(shippingDataArray);
   } else if (currentView === 1) {
     document.getElementById("formContainer").style.display = "none";
