@@ -329,7 +329,7 @@
         //Can decide what inputs are necessary - ask Simon - 6 recommended - atm only ask for first name
         Array.from(document.querySelectorAll("input")).forEach((input) => {
           if (input.value == "" && input.id === "fName" || input.value == "" && input.id === "address") {
-            alert("Make sure you fill out the Namer and Adress field to proceed")
+            alert("Make sure you fill out the Name and Adress field to proceed")
             error(input);
             e.preventDefault()
             document.getElementById("next").disabled = "true"
