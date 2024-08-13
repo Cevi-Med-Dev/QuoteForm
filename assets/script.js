@@ -190,7 +190,7 @@
                     <label for="fName">First name:</label>
                     <input value="${
                       array === undefined ? "" : array[0].value
-                    }" type="text" id="fName" name="fName" placeholder="First name">
+                    }" required type="text" id="fName" name="fName" placeholder="First name">
                     <span class="errorText" style="display: none"></span>
                     </div>
                     <div>
@@ -206,14 +206,14 @@
                       <label for="phone">Phone Number</label>
                       <input value="${
                         array === undefined ? "" : array[2].value
-                      }" type="tel" id="phone" name="phone" placeholder="Phone Number">
+                      }" required type="tel" id="phone" name="phone" placeholder="Phone Number">
                  <span class="errorText" style="display: none"></span>
                       </div>
                       <div>
                       <label for="email">Email</label>
                       <input value="${
                         array === undefined ? "" : array[3].value
-                      }" type="email" id="email" name="email" placeholder="Email Address">
+                      }" type="email"  id="email" name="email" placeholder="Email Address">
                  <span class="errorText" style="display: none"></span>
                       </div>
                       </div>
@@ -222,7 +222,7 @@
                   <label for="address"> Shipping Address</label>
                       <input value="${
                         array === undefined ? "" : array[4].value
-                      }" type="text" id="address" name="address" placeholder="Address">
+                      }" required type="text" id="address" name="address" placeholder="Address">
                  <span class="errorText" style="display: none"></span>
                       </div>
               </div>
@@ -328,8 +328,11 @@
     
         //Can decide what inputs are necessary - ask Simon - 6 recommended - atm only ask for first name
         Array.from(document.querySelectorAll("input")).forEach((input) => {
-          if (input.value == "" && input.id === "fName") {
+          if (input.value == "" && input.id === "fName" || input.value == "" && input.id === "address") {
+            alert("Make sure you fill out the Namer and Adress field to proceed")
             error(input);
+            e.preventDefault()
+            document.getElementById("next").disabled = "true"
           } else {
             shippingDataArray.push(input);
             approved(input);
